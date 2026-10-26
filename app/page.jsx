@@ -4,210 +4,232 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const products = [
-  { id: 1, name: "التيشيرت الأسود", color: "#252525", price: 99 },
-  { id: 2, name: "التيشيرت الأبيض", color: "#eeeeea", price: 109 },
-  { id: 3, name: "التيشيرت الكحلي", color: "#253a65", price: 119 },
-  { id: 4, name: "التيشيرت العنابي", color: "#852c45", price: 129 }
+const shirts = [
+  {
+    id: 1,
+    name: "تيشيرت أسود",
+    price: 99,
+    image: "https://placehold.co/600x750/222222/ffffff.png?text=BLACK+TEE"
+  },
+  {
+    id: 2,
+    name: "تيشيرت أبيض",
+    price: 109,
+    image: "https://placehold.co/600x750/f4f4f4/222222.png?text=WHITE+TEE"
+  },
+  {
+    id: 3,
+    name: "تيشيرت كحلي",
+    price: 119,
+    image: "https://placehold.co/600x750/233a66/ffffff.png?text=NAVY+TEE"
+  },
+  {
+    id: 4,
+    name: "تيشيرت عنابي",
+    price: 129,
+    image: "https://placehold.co/600x750/772b40/ffffff.png?text=BURGUNDY+TEE"
+  }
 ];
 
-function Shirt({ color }) {
-  return (
-    <svg viewBox="0 0 220 270" width="100%" style={{ overflow: "visible" }}>
-      <defs>
-        <linearGradient id={"fabric" + color} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#ffffff" stopOpacity=".22" />
-          <stop offset="45%" stopColor="#000000" stopOpacity="0" />
-          <stop offset="100%" stopColor="#000000" stopOpacity=".25" />
-        </linearGradient>
-      </defs>
-      <path
-        d="M110 26 Q100 13 111 8 Q124 4 125 17"
-        fill="none" stroke="#c5c5c5" strokeWidth="4"
-        strokeLinecap="round"
-      />
-      <path d="M110 25 L35 65 L185 65 Z"
-        fill="none" stroke="#b9b9b9" strokeWidth="4"
-        strokeLinejoin="round" />
-      <path
-        d="M76 43 L45 52 L8 112 L49 139 L66 113 L66 253
-        Q110 262 154 253 L154 113 L171 139 L212 112
-        L175 52 L144 43 Q110 72 76 43 Z"
-        fill={color} stroke="#000000" strokeOpacity=".18"
-        strokeWidth="2"
-      />
-      <path
-        d="M76 43 L45 52 L8 112 L49 139 L66 113 L66 253
-        Q110 262 154 253 L154 113 L171 139 L212 112
-        L175 52 L144 43 Q110 72 76 43 Z"
-        fill={"url(#fabric" + color + ")"}
-      />
-      <path d="M76 43 Q110 84 144 43"
-        fill="none" stroke="#000" strokeOpacity=".28" strokeWidth="6" />
-      <path d="M66 113 Q78 147 76 231 M154 113 Q140 160 146 235"
-        fill="none" stroke="#fff" strokeOpacity=".09" strokeWidth="5" />
-      <text x="110" y="145" textAnchor="middle"
-        fill={color === "#eeeeea" ? "#222" : "#fff"}
-        fontSize="18" fontWeight="bold" letterSpacing="3">
-        STUDIO
-      </text>
-    </svg>
-  );
-}
-
 export default function Home() {
-  const [selected, setSelected] = useState(null);
-  const [cart, setCart] = useState(0);
-  const [size, setSize] = useState("M");
+  const [active, setActive] = useState(0);
+  const [open, setOpen] = useState(false);
 
-  const current = products.find(p => p.id === selected);
+  const spring = {
+    type: "spring",
+    stiffness: 120,
+    damping: 22
+  };
 
-  function changeShirt(direction) {
-    const index = products.findIndex(p => p.id === selected);
-    setSelected(products[(index + direction + 4) % 4].id);
+  function move(direction) {
+    setActive((prev) => (prev + direction + shirts.length) % shirts.length);
   }
 
   return (
-    <main dir="rtl" style={{
-      minHeight: "100vh", background: "#111216",
-      color: "white", fontFamily: "Arial, sans-serif",
-      overflow: "hidden", position: "relative",
-      padding: "24px 16px", boxSizing: "border-box"
+    <main style={{
+      minHeight: "100vh",
+      background: "#f5f4f0",
+      color: "#191919",
+      fontFamily: "Arial, sans-serif",
+      overflow: "hidden",
+      position: "relative"
     }}>
       <header style={{
-        display: "flex", justifyContent: "space-between",
-        alignItems: "center", maxWidth: 1100, margin: "auto"
+        padding: "25px 6%",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center"
       }}>
-        <strong style={{ fontSize: 23 }}>STUDIO WEAR</strong>
-        <span>السلة ({cart})</span>
+        <strong style={{ fontSize: 22 }}>STUDIO WEAR</strong>
+        <span>COLLECTION 01 / 04</span>
       </header>
 
-      <div style={{ textAlign: "center", marginTop: 45 }}>
-        <h1 style={{ fontSize: "clamp(28px,5vw,52px)", margin: 0 }}>
-          اكتشف مجموعتنا
+      <div style={{ textAlign: "center", marginTop: 30 }}>
+        <h1 style={{
+          fontSize: "clamp(30px, 5vw, 58px)",
+          marginBottom: 8
+        }}>
+          THE COLLECTION
         </h1>
-        <p style={{ color: "#aaa" }}>
-          اختر التيشيرت لتجربة الحركة التفاعلية
+        <p style={{ color: "#777" }}>
+          اسحب أو استخدم الأسهم للتنقل بين التيشيرتات
         </p>
       </div>
 
       <section style={{
-        maxWidth: 950, margin: "70px auto 0",
-        position: "relative", height: 370
+        height: "min(62vh, 550px)",
+        position: "relative",
+        maxWidth: 1100,
+        margin: "30px auto"
       }}>
         <div style={{
-          position: "absolute", top: 25, left: "2%",
-          width: "96%", height: 8, borderRadius: 10,
-          background: "linear-gradient(#aaa,#555,#ddd)",
-          boxShadow: "0 4px 18px #000"
+          position: "absolute",
+          top: 65,
+          left: "5%",
+          width: "90%",
+          height: 7,
+          background: "linear-gradient(#aaa, #666, #ddd)",
+          borderRadius: 10,
+          boxShadow: "0 5px 15px #0002"
         }} />
 
-        <div style={{
-          position: "relative", display: "grid",
-          gridTemplateColumns: "repeat(4,minmax(0,1fr))",
-          gap: 0, paddingTop: 25
-        }}>
-          {products.map((product) => (
-            <motion.button
-              layoutId={"shirt-" + product.id}
-              key={product.id}
-              onClick={() => setSelected(product.id)}
-              whileHover={!selected ? { y: -12, scale: 1.04 } : {}}
-              animate={{
-                opacity: selected && selected !== product.id ? .35 : 1,
-                scale: selected === product.id ? 0 : 1
+        {shirts.map((shirt, index) => {
+          let distance = index - active;
+
+          if (distance > 2) distance -= 4;
+          if (distance < -2) distance += 4;
+
+          return (
+            <motion.div
+              key={shirt.id}
+              onClick={() => {
+                if (index === active) {
+                  setOpen(true);
+                } else {
+                  setActive(index);
+                }
               }}
-              transition={{ type: "spring", stiffness: 180, damping: 22 }}
+              animate={{
+                x: `calc(-50% + ${distance * 65}%)`,
+                y: Math.abs(distance) * 15,
+                scale: distance === 0 ? 1.08 : 0.78,
+                rotateY: distance * -20,
+                opacity: Math.abs(distance) === 2 ? 0.65 : 1
+              }}
+              transition={spring}
               style={{
-                border: 0, background: "transparent",
-                cursor: "pointer", padding: 0,
-                transformOrigin: "top center"
+                position: "absolute",
+                top: 65,
+                left: "50%",
+                width: "min(56vw, 340px)",
+                height: "75%",
+                transformOrigin: "top center",
+                cursor: "pointer",
+                zIndex: 10 - Math.abs(distance),
+                transformStyle: "preserve-3d"
               }}
             >
-              <Shirt color={product.color} />
-            </motion.button>
-          ))}
-        </div>
+              <div style={{
+                position: "absolute",
+                top: -28,
+                left: "50%",
+                transform: "translateX(-50%)",
+                fontSize: 50,
+                color: "#888"
+              }}>⌒</div>
+
+              <img
+                src={shirt.image}
+                alt={shirt.name}
+                draggable={false}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "contain",
+                  filter: "drop-shadow(0 18px 18px #0003)"
+                }}
+              />
+            </motion.div>
+          );
+        })}
       </section>
 
+      <div style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        gap: 25,
+        paddingBottom: 35
+      }}>
+        <button onClick={() => move(-1)} style={arrow}>←</button>
+
+        <div style={{ textAlign: "center", minWidth: 170 }}>
+          <strong>{shirts[active].name}</strong>
+          <p>{shirts[active].price} ريال</p>
+          <small>اضغط على التيشيرت لعرضه</small>
+        </div>
+
+        <button onClick={() => move(1)} style={arrow}>→</button>
+      </div>
+
       <AnimatePresence>
-        {current && (
+        {open && (
           <motion.div
-            key="overlay"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             style={{
-              position: "fixed", inset: 0,
-              background: "rgba(8,9,13,.94)",
-              zIndex: 20, display: "flex",
-              alignItems: "center", justifyContent: "center",
-              padding: 20, boxSizing: "border-box"
+              position: "fixed",
+              inset: 0,
+              background: "#f5f4f0",
+              zIndex: 50,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: 25
             }}
           >
-            <button onClick={() => setSelected(null)}
+            <button
+              onClick={() => setOpen(false)}
               style={{
-                position: "absolute", top: 25, right: 25,
-                background: "#333", color: "#fff",
-                border: 0, borderRadius: 50,
-                width: 45, height: 45, fontSize: 24,
+                position: "absolute",
+                top: 25,
+                right: 25,
+                background: "transparent",
+                border: "none",
+                fontSize: 35,
                 cursor: "pointer"
-              }}>
-              ×
+              }}
+            >×</button>
+
+            <motion.img
+              src={shirts[active].image}
+              initial={{ scale: 0.7, y: 80, rotateY: -25 }}
+              animate={{ scale: 1, y: 0, rotateY: 0 }}
+              exit={{ scale: 0.7, y: 80 }}
+              transition={spring}
+              style={{
+                width: "min(80vw, 450px)",
+                height: "60vh",
+                objectFit: "contain"
+              }}
+            />
+
+            <h2>{shirts[active].name}</h2>
+            <p>{shirts[active].price} ريال</p>
+            <button
+              onClick={() => setOpen(false)}
+              style={{
+                background: "#191919",
+                color: "white",
+                padding: "14px 35px",
+                border: 0,
+                cursor: "pointer"
+              }}
+            >
+              العودة للمجموعة
             </button>
-
-            <div style={{
-              display: "flex", flexWrap: "wrap",
-              alignItems: "center", justifyContent: "center",
-              gap: 35, maxWidth: 900, width: "100%"
-            }}>
-              <motion.div
-                key={current.id}
-                initial={{ scale: .6, y: 90, opacity: 0 }}
-                animate={{ scale: 1, y: 0, opacity: 1 }}
-                exit={{ scale: .7, opacity: 0 }}
-                transition={{ type: "spring", stiffness: 140, damping: 19 }}
-                style={{ width: "min(65vw,350px)" }}
-              >
-                <Shirt color={current.color} />
-              </motion.div>
-
-              <div style={{ minWidth: 220 }}>
-                <h2>{current.name}</h2>
-                <h3>{current.price} ريال</h3>
-                <p style={{ color: "#aaa" }}>اختر المقاس</p>
-                <div style={{ display: "flex", gap: 8 }}>
-                  {["S", "M", "L", "XL"].map(s => (
-                    <button key={s} onClick={() => setSize(s)}
-                      style={{
-                        padding: "12px 15px",
-                        border: size === s ? "2px solid white" : "1px solid #555",
-                        background: size === s ? "#444" : "#222",
-                        color: "white", borderRadius: 8,
-                        cursor: "pointer"
-                      }}>{s}</button>
-                  ))}
-                </div>
-
-                <button onClick={() => setCart(c => c + 1)}
-                  style={{
-                    display: "block", marginTop: 20,
-                    padding: "15px 30px", border: 0,
-                    borderRadius: 9, background: "#fff",
-                    color: "#111", fontWeight: "bold",
-                    cursor: "pointer"
-                  }}>
-                  أضف إلى السلة
-                </button>
-
-                <div style={{ display: "flex", gap: 12, marginTop: 20 }}>
-                  <button onClick={() => changeShirt(-1)}
-                    style={navStyle}>السابق</button>
-                  <button onClick={() => changeShirt(1)}
-                    style={navStyle}>التالي</button>
-                </div>
-              </div>
-            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -215,8 +237,12 @@ export default function Home() {
   );
 }
 
-const navStyle = {
-  padding: "12px 20px", border: "1px solid #555",
-  background: "#222", color: "#fff",
-  borderRadius: 8, cursor: "pointer"
+const arrow = {
+  width: 48,
+  height: 48,
+  borderRadius: "50%",
+  border: "1px solid #999",
+  background: "transparent",
+  fontSize: 23,
+  cursor: "pointer"
 };
